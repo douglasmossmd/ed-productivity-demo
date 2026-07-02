@@ -13,7 +13,6 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from datetime import date, timedelta
-load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
 
 def _secret(key: str, default: str = "") -> str:
     """Read from st.secrets when on Streamlit Cloud, fall back to env var locally."""

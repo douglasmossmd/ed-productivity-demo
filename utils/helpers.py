@@ -250,6 +250,12 @@ def load_data(start_period: str, end_period: str, location: str = "CCD"):
             if m in agg.columns:
                 valid = agg[m].dropna()
                 if valid.empty:
+                    # column exists but all NaN — still create the benchmark columns
+                    # so downstream pages don't KeyError when has_shifts is True
+                    agg[f"{m}_p25"]     = np.nan
+                    agg[f"{m}_median"]  = np.nan
+                    agg[f"{m}_p75"]     = np.nan
+                    agg[f"{m}_quartile"] = "—"
                     continue
                 agg[f"{m}_p25"]    = valid.quantile(0.25)
                 agg[f"{m}_median"] = valid.median()
@@ -610,9 +616,16 @@ def generate_shift_breakdown(provider_row):
     seed = abs(hash(str(provider_row["provider_name"]))) % (2**31)
     rng  = np.random.default_rng(seed)
 
-    total_shifts   = int(provider_row.get("shifts_worked", 0))
-    night_shifts   = int(provider_row.get("night_shifts",  round(total_shifts * 0.12)))
-    weekend_shifts = int(provider_row.get("weekend_shifts",round(total_shifts * 0.28)))
+    def _safe_int(val, default=0):
+        try:
+            f = float(val)
+            return default if (f != f) else int(f)  # f != f is True for NaN
+        except (TypeError, ValueError):
+            return default
+
+    total_shifts   = _safe_int(provider_row.get("shifts_worked", 0))
+    night_shifts   = _safe_int(provider_row.get("night_shifts"),  round(total_shifts * 0.12))
+    weekend_shifts = _safe_int(provider_row.get("weekend_shifts"),round(total_shifts * 0.28))
 
     if total_shifts == 0:
         return pd.DataFrame(columns=["category","shift_type","count","hours"]), 0, 0

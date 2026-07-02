@@ -233,10 +233,17 @@ st.markdown("#### Shift Activity")
 
 shift_df, opu, spu = generate_shift_breakdown(prov_row)
 
-total_s   = int(prov_row.get("shifts_worked",  0))
-night_s   = int(prov_row.get("night_shifts",   0))
-weekend_s = int(prov_row.get("weekend_shifts", 0))
-hours_w   = float(prov_row.get("hours_worked", 0))
+def _safe_int(val, default=0):
+    try:
+        f = float(val)
+        return default if (f != f) else int(f)
+    except (TypeError, ValueError):
+        return default
+
+total_s   = _safe_int(prov_row.get("shifts_worked"),  0)
+night_s   = _safe_int(prov_row.get("night_shifts"),   0)
+weekend_s = _safe_int(prov_row.get("weekend_shifts"), 0)
+hours_w   = float(prov_row.get("hours_worked", 0) or 0)
 avg_hrs   = hours_w / max(total_s, 1)
 
 def act_card(col, label, value, sub=None, color="#2C2C2A", tip_key=None):

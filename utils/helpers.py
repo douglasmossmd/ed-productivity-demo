@@ -117,7 +117,8 @@ def get_available_periods(location: str = "CCD"):
     # Fallback: local CSV
     if not os.path.exists(MASTER_PATH):
         return []
-    df = pd.read_csv(MASTER_PATH, usecols=["period"])
+    df = pd.read_csv(MASTER_PATH, usecols=["period", "location"])
+    df = df[df["location"] == location]
     return sorted(df["period"].unique().tolist())
 
 
@@ -168,7 +169,11 @@ def load_data(start_period: str, end_period: str, location: str = "CCD"):
             st.error(f"No data found in Supabase and master_productivity.csv is missing.\nRun build_master.py or upload data via the Upload tab.")
             st.stop()
         master   = pd.read_csv(MASTER_PATH)
-        selected = master[(master["period"] >= start_period) & (master["period"] <= end_period)].copy()
+        selected = master[
+            (master["period"]   >= start_period) &
+            (master["period"]   <= end_period)   &
+            (master["location"] == location)
+        ].copy()
 
     if selected.empty:
         st.warning(f"No profee cube data found for {start_period} – {end_period}.")

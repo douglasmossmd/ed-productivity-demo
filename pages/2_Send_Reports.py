@@ -205,7 +205,7 @@ else:
                 font-size:13px;background:white;line-height:1.7;">
       <div style="color:#888;font-size:11px;margin-bottom:12px;">
         <b>To:</b> {provider_email}<br>
-        <b>From:</b> ccd.ed.productivity@gmail.com<br>
+        <b>From:</b> ed.analytics@demo.com<br>
         <b>Subject:</b> Your ED Productivity Report — {period_label}
       </div>
       <div style="border-top:1px solid #eee;padding-top:12px;">
@@ -219,8 +219,8 @@ else:
         <br>
         All other provider data in your report has been fully de-identified.
         If you have questions or would like to discuss your results, please reach out to
-        <a href="mailto:EDPhysicianLeadership@uchicagomedicine.org">
-        EDPhysicianLeadership@uchicagomedicine.org</a>, or simply reply to this email.<br><br>
+        <a href="mailto:ed.leadership@demo.com">
+        ed.leadership@demo.com</a>, or simply reply to this email.<br><br>
         Best regards,<br>
         <b>Emergency Medicine — {location} Analytics</b>
       </div>

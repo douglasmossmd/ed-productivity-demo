@@ -177,10 +177,15 @@ def load_data(start_period: str, end_period: str, location: str = "CCD"):
     n_months = selected["period"].nunique()
 
     # Aggregate per provider
-    agg = selected.groupby("provider_name").agg(
+    agg_dict = dict(
         encounter_count=("encounter_count", "sum"),
         total_wrvu=("total_wrvu", "sum"),
-    ).reset_index()
+    )
+    if "shifts_worked" in selected.columns:
+        agg_dict["shifts_worked"] = ("shifts_worked", "sum")
+    if "hours_worked" in selected.columns:
+        agg_dict["hours_worked"] = ("hours_worked", "sum")
+    agg = selected.groupby("provider_name").agg(**agg_dict).reset_index()
 
     # Remove providers with 0 encounters or 0 wRVUs (admin/holdover charges)
     agg = agg[(agg["encounter_count"] > 0) & (agg["total_wrvu"] > 0)].copy()
@@ -331,7 +336,6 @@ def _load_shiftadmin_emails() -> dict:
         _sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         from shiftadmin_api import ShiftAdminClient
         from config import NAME_ALIASES
-        load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
         username = _secret("SA_USERNAME")
         password = _secret("SA_PASSWORD")
         if not username or not password:
